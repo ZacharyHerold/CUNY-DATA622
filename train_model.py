@@ -124,7 +124,8 @@ X_test = X_test.drop(['Name'], axis=1)
 random_forest_model = RandomForestClassifier(n_estimators=35)
 random_forest_model.fit(X_train, y_train)
 y_predict_train = random_forest_model.predict(X_train)
-y_predict_test = random_forest_model.predict(X_test)
+y_predict = random_forest_model.predict(X_test)
+prediction = pd.DataFrame(y_predict, columns=['predictions'])
 
 # Appears in score_model.py
 # print("Train Accuracy :{}".format(random_forest_model.score(X_train, y_predict_train)))
