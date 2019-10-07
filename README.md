@@ -8,53 +8,42 @@ DATA 622 # hw2 = Zachary Herold
 3. CRITICAL THINKING (3 points total)
 
 Modify this ReadMe file to answer the following questions directly in place.
+
 	1) Kaggle changes links/ file locations/login process/ file content
-	
+
+In this case recommendations include to:
+	Make use of kaggle data APIs, i.e. kaggle competitions download -c titanic
+	Make use of version control managers (i.e., github)
+	Keep local data store
 	
 	
 	2) We run out of space on HD / local permissions issue - can't save files
 	
-Before we can actually work with the data, we need to do something with it so we can begin to filter it to work with subsets of the data. This is usually what I would use pandas’ dataframe for but with large data files, we need to store the data somewhere else. In this case, we’ll set up a local sqllite database, read the csv file in chunks and then write those chunks to sqllite.
-
-To do this, we’ll first need to create the sqllite database using the following command.
+a) In this case, we can make use of subseting and chunking of the data. It is possible to write chunks to relational DB such as sqllite, loading into Python as needed. This can be achieved through a create_engine function, see:
 
 csv_database = create_engine('sqlite:///csv_database.db')
-Next, we need to iterate through the CSV file in chunks and store the data into sqllite.
+Next, we need to iterate through the CSV file in chunks and store the data into sqllite, setting a chunksize parameter. See: https://pythondata.com/working-large-csv-files-python/
 
+b) Also, specifying a buffer parameter of greater size than default when calling Python's open(). See:  stackoverflow.com/a/18194856/145400. 
 
-chunksize = 100000
-i = 0
-j = 1
-for df in pd.read_csv(file, chunksize=chunksize, iterator=True):
-      df = df.rename(columns={c: c.replace(' ', '') for c in df.columns}) 
-      df.index += j
-      i+=1
-      df.to_sql('table', csv_database, if_exists='append')
-      j = df.index[-1] + 1
-	
-	
-https://pythondata.com/working-large-csv-files-python/
-
-if you do not specify the buffering parameter upon calling Python's open(), a (small) buffer is usually applied, according to the "system default". The size of this buffer is not documented. For some version of glibc, here someone determined it to be 8 kB: stackoverflow.com/a/18194856/145400. For certain applications it makes sense to increase that buffer size with the buffering parameter. No general statement possible, but benchmarks help. Sometimes it makes sense to explicitly collect data in memory first, via docs.python.org/2/library/stringio.html 
+c) Also, one can explicitly collect data in memory first, via docs.python.org/2/library/stringio.html 
 
 	3) Someone updated python packages and there is unintended effect (functions retired or act differently)
 
-Make use of virtual environments
-Revert back to prior version (indicated on requirements.txt?)
+In this case recommendations include to:
+	Make use of virtual environments
+	Make use of version control managers (i.e., github)
+	Revert back to prior version of package (ideally indicated on requirements.txt)
 	
 	
 	4) Docker issues - lost internet within docker due to some ip binding to vm or local routing issues( I guess this falls under lost internet, but I am talking more if docker is the cause rather then ISP)	
 	
-Check:
+a) Check:
 ip route list // there may be some network powersave options on your host that messes with the virtual network interfaces that docker needs.
 ip addr show 
-iptables -t nat -L -n -v  //  where docker puts all the rules to actually allow the containers to talk to different parts of then network (between them or out). Maybe the problem is a firewall tool/helper that wants full control over the iptables rules, and is therefor flushing the docker rules from time to time.
+iptables -t nat -L -n -v  //  where docker puts all the rules to actually allow the containers to talk to different parts of then network (between them or out). Maybe the problem is a firewall tool/helper that wants full control over the iptables rules, and is therefor flushing the docker rules from time to time. See: https://stackoverflow.com/questions/24754984/docker-containers-keep-losing-internet
 	
-Source: https://stackoverflow.com/questions/24754984/docker-containers-keep-losing-internet
-	
-One workaround is by passing --net=host to your run command. This will cause your containers to use their hosts network stack and will disable linking of containers, however (as docker can't/shouldn't update the /etc/hosts of the host machine)
-
-https://github.com/moby/moby/issues/14073
+b) One possible workaround is by passing --net=host to your run command. This will cause your containers to use their hosts network stack and will disable linking of containers. See: https://github.com/moby/moby/issues/14073
 
 --------------------------------------------------------------------------------------------------------
 
